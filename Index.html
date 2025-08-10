@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weekly Habit Tracker</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #1e1e1e;
+        color: white;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    h1 {
+        margin-top: 20px;
+        color: #ffcc00;
+        text-shadow: 0 0 8px #ffcc00;
+    }
+    #habitInput {
+        padding: 8px;
+        font-size: 14px;
+        border-radius: 5px;
+        border: none;
+        width: 200px;
+        outline: none;
+    }
+    button {
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        margin-left: 5px;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    table {
+        margin: 20px auto;
+        border-collapse: collapse;
+        width: 90%;
+        max-width: 800px;
+    }
+    th, td {
+        border: 1px solid #555;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #333;
+    }
+    td {
+        background-color: #2a2a2a;
+    }
+    input[type="checkbox"] {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+    .remove-btn {
+        background-color: #d9534f;
+    }
+    .remove-btn:hover {
+        background-color: #c9302c;
+    }
+    footer {
+        margin-top: auto;
+        padding: 10px 0;
+        font-size: 0.9rem;
+        color: #aaa;
+        text-align: center;
+    }
+    footer span {
+        font-weight: bold;
+        color: #ffcc00;
+    }
+</style>
+</head>
+<body>
+
+<h1>Weekly Habit Tracker</h1>
+<div>
+    <input type="text" id="habitInput" placeholder="Enter habit">
+    <button onclick="addHabit()">Add Habit</button>
+</div>
+
+<table id="habitTable">
+    <thead>
+        <tr>
+            <th>Habit</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+            <th>Sun</th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<footer>
+    Created with ♥️ by <span>Sadik Pathan</span>
+</footer>
+
+<script>
+    let habits = JSON.parse(localStorage.getItem('habits')) || [];
+
+    function saveHabits() {
+        localStorage.setItem('habits', JSON.stringify(habits));
+    }
+
+    function addHabit() {
+        let habitName = document.getElementById('habitInput').value.trim();
+        if (!habitName) return alert("Please enter a habit.");
+        
+        let habitData = { name: habitName, days: [false, false, false, false, false, false, false] };
+        habits.push(habitData);
+        saveHabits();
+        document.getElementById('habitInput').value = '';
+        renderTable();
+    }
+
+    function toggleDay(habitIndex, dayIndex) {
+        habits[habitIndex].days[dayIndex] = !habits[habitIndex].days[dayIndex];
+        saveHabits();
+    }
+
+    function removeHabit(index) {
+        habits.splice(index, 1);
+        saveHabits();
+        renderTable();
+    }
+
+    function renderTable() {
+        let tbody = document.querySelector('#habitTable tbody');
+        tbody.innerHTML = '';
+        habits.forEach((habit, habitIndex) => {
+            let row = `<tr>
+                <td>${habit.name}</td>`;
+            habit.days.forEach((done, dayIndex) => {
+                row += `<td><input type="checkbox" ${done ? "checked" : ""} onclick="toggleDay(${habitIndex}, ${dayIndex})"></td>`;
+            });
+            row += `<td><button class="remove-btn" onclick="removeHabit(${habitIndex})">X</button></td></tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    renderTable();
+</script>
+
+</body>
+</html>
